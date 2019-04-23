@@ -1,0 +1,5 @@
+Fields of relevance:
+ID, city, state, country code, country, property type, number of people for listing, amenities, price
+ 
+* find the average amenities for a region
+* 
