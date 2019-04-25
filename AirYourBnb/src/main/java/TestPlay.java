@@ -10,7 +10,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import java.util.ArrayList;
 
-public class JavaWordCount {
+public class TestPlay {
 
     private static void wordCount(String fileName) {
 

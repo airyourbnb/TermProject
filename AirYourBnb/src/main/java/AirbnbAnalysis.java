@@ -3,6 +3,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
+import java.util.Arrays;
 
 public class AirbnbAnalysis{
 
@@ -12,11 +13,11 @@ public class AirbnbAnalysis{
     public static void main(String[] args){
 
         String fileName = null;
-        const String anthony_hdfs = "hdfs://dover.cs.colostate.edu:42080/cs455/termproject/airbnb-listings.csv";
-        const String daniel_hdfs = "hdfs://juneau.cs.colostate.edu:11223/cs455/TERM/airbnb-listings.csv";
-        const String bruce_hdfs = "hdfs://jackson:2084/airbnb/airbnb-listings.csv";
+        String anthony_hdfs = "hdfs://dover.cs.colostate.edu:42080/cs455/termproject/airbnb-listings.csv";
+        String daniel_hdfs = "hdfs://juneau.cs.colostate.edu:11223/cs455/TERM/airbnb-listings.csv";
+        String bruce_hdfs = "hdfs://jackson:2084/airbnb/airbnb-listings.csv";
 
-        if(args.length() != 1){
+        if(args.length != 1){
             System.err.println("Supply your HDFS cluster information");
             System.exit(-1);
         }
@@ -34,7 +35,7 @@ public class AirbnbAnalysis{
         }
 
 
-        parkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
+        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
 
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
