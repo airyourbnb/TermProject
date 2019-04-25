@@ -1,16 +1,15 @@
 #!/usr/bin/bash
 
-#$0 will contain the name of the spark namenode
-#$1 will contain the port number
-#$2 will be the class that contains the job
-#$3 name of the jar 
+#$1 will contain the name of the spark namenode
+#$2 will contain the port number
+#$3 will be the class that contains the job
+#$4 name of the jar
+#$5 will be the number relating to who's HDFS to connect to. 1=anthony 2=daniel 3=bruce
 
-#FIXME this doesnt work 
-
-if [ "$#" -ne 4 ]; then
-    echo "Usage: ./run-job.sh [namenode] [portnumber] [class of driver] [jar name in target dir]"
+if [ "$#" -ne 5 ]; then
+    echo "Usage: ./run-job.sh [namenode] [portnumber] [class of driver] [jar name in target dir] [java args]"
 	exit
 fi
 echo $#
-
-$SPARK_HOME/bin/spark-submit --master spark://"$0":"$1" --deploy-mode cluster --class "$2" --supervise target/scala-2.11/"$3"_2.11-1.0.jar 
+echo $SPARK_HOME/bin/spark-submit --master spark://$1:$2 --deploy-mode cluster --class $3 --supervise target/scala-2.11/$4_2.11-1.0.jar $5
+$SPARK_HOME/bin/spark-submit --master spark://$1:$2 --deploy-mode cluster --class $3 --supervise target/scala-2.11/$4_2.11-1.0.jar $5
