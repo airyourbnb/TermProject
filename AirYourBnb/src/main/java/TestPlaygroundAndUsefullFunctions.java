@@ -50,12 +50,7 @@ public class JavaWordCount {
         JavaRDD<String> inputFile = sparkContext.read().format("hdfs://jackson:2084/airbnb/airbnb-listings-schema.json").option("header","true").load("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
 
         JavaRDD<String> wordsFromFile = inputFile.take(30);
-
-<<<<<<< HEAD:AirYourBnb/src/main/scala/JavaWordCount.java
-        wordsFromFile.saveAsTextFile("wordsFromFile");
         */
-        //With this example where does this actually save the data?
-        countData.saveAsTextFile("CountData");
     }
 
     public static void writeAFile(String message, String filePath, JavaSparkContext SpContext){
@@ -86,7 +81,7 @@ public class JavaWordCount {
         System.out.println("I AM INSIDE THE PROGRAM");
 
         //TODO make sure to modify this when we run our code
-        wordCount("hdfs://dover:42080/cs455/termproject/airbnb-listing.csv");
+        //wordCount("hdfs://dover:42080/cs455/termproject/airbnb-listing.csv");
         //wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
     }
 }
