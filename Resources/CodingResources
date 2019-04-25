@@ -2,3 +2,13 @@ https://stackoverflow.com/questions/29704333/spark-load-csv-file-as-dataframe
 
 Java job example
 https://github.com/rathboma/hadoop-framework-examples/tree/master/spark
+
+Java Spark 2.x reading in a file into 
+https://www.oreilly.com/library/view/apache-spark-2x/9781787126497/8603f16b-9c0a-47b4-8434-5d58c48c29ac.xhtml
+
+Explaining RDDs vs DataFrames vs Datasets
+https://databricks.com/blog/2016/07/14/a-tale-of-three-apache-spark-apis-rdds-dataframes-and-datasets.html
+
+load with csv format file
+https://www.quora.com/How-do-I-read-a-CSV-file-in-RDD-Spark-2-0-Do-not-paste-the-Stack-Overflow-link
+
