@@ -38,6 +38,8 @@ public class TestPlay {
         }
 
 
+        writeAFile(result, "/debug/column_name", sparkContext);
+
 
         /*
         df.select("year", "model").write()
@@ -72,16 +74,16 @@ public class TestPlay {
         //    System.exit(0);
         //}
 
-        SparkConf sparkConf = new SparkConf();
+        //SparkConf sparkConf = new SparkConf();
 
-        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+        //JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
-        writeAFile("baby got baka", "/debug_logs/babyGotBack", sparkContext);
+        //writeAFile("baby got baka", "/debug_logs/babyGotBack", sparkContext);
 
         System.out.println("I AM INSIDE THE PROGRAM");
 
         //TODO make sure to modify this when we run our code
         //wordCount("hdfs://dover:42080/cs455/termproject/airbnb-listing.csv");
-        //wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
+        wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
     }
 }
