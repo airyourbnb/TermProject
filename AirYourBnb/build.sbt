@@ -1,4 +1,4 @@
-name := "Airmybnb"
+name := "Airyourbnb"
 
 version := "1.0"
 

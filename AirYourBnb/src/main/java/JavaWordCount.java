@@ -21,6 +21,7 @@ public class JavaWordCount {
 
         JavaPairRDD countData = wordsFromFile.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) -> (int) x + (int) y);
 
+        //With this example where does this actually save the data?
         countData.saveAsTextFile("CountData");
     }
 
@@ -31,6 +32,8 @@ public class JavaWordCount {
         //    System.exit(0);
         //}
 
-        wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
+        //TODO make sure to modify this when we run our code
+        wordCount("hdfs://dover:42080/cs455/termproject/airbnb-listing.csv");
+        //wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
     }
 }
