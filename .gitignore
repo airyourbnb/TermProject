@@ -1,3 +1,9 @@
 airbnb-listings.csv
 spark-2.4.1-bin-hadoop2.7.tgz
 
+AirYourBnb/project/*
+AirYourBnb/target/*
+
+AirYourBnb/.gradle/
+AirYourBnb/.idea/
+AirYourBnb/AirYourBnb.iml

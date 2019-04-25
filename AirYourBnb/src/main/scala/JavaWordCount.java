@@ -4,8 +4,11 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
-
+import org.apache.spark.sql.SQLContext;
 import java.util.Arrays;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import java.util.ArrayList;
 
 public class JavaWordCount {
 
@@ -15,14 +18,54 @@ public class JavaWordCount {
 
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
-        JavaRDD<String> inputFile = sparkContext.textFile(fileName);
 
-        JavaRDD<String> wordsFromFile = inputFile.flatMap(content -> Arrays.asList(content.split(" ")).iterator());
 
-        JavaPairRDD countData = wordsFromFile.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) -> (int) x + (int) y);
+        SQLContext sqlContext = new SQLContext(sparkContext);
+        Dataset<Row> df = sqlContext.read()
+                .format("com.databricks.spark.csv")
+                .option("inferSchema", "true")
+                .option("header", "true")
+                .load("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
 
-        countData.saveAsTextFile("CountData");
+
+        String[] cols = df.columns();
+
+
+
+        String result = "";
+        for(String s:cols){
+            result += " " + s;
+        }
+
+
+
+        /*
+        df.select("year", "model").write()
+                .format("com.databricks.spark.csv")
+                .option("header", "true")
+                .save("newcars.csv");
+
+
+
+        JavaRDD<String> inputFile = sparkContext.read().format("hdfs://jackson:2084/airbnb/airbnb-listings-schema.json").option("header","true").load("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
+
+        JavaRDD<String> wordsFromFile = inputFile.take(30);
+
+        wordsFromFile.saveAsTextFile("wordsFromFile");
+        */
     }
+
+    public static void writeAFile(String message, String filePath, JavaSparkContext SpContext){
+        ArrayList<String> temp = new ArrayList<String>();
+
+        temp.add(message);
+
+        JavaRDD<String> test = SpContext.parallelize(temp);
+
+        test.saveAsTextFile(filePath);
+    }
+
+
 
     public static void main(String[] args) {
 
@@ -31,6 +74,14 @@ public class JavaWordCount {
         //    System.exit(0);
         //}
 
-        wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
+        SparkConf sparkConf = new SparkConf();
+
+        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+
+        writeAFile("baby got baka", "/debug_logs/babyGotBack", sparkContext);
+
+        System.out.println("I AM INSIDE THE PROGRAM");
+
+        //wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
     }
 }
