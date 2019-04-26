@@ -1,8 +1,18 @@
+import java.io.Serializable;
+
 import org.apache.spark.SparkConf;
+
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import scala.Tuple2;
+
 import java.util.Arrays;
 
 public class AirbnbAnalysis{
@@ -35,15 +45,23 @@ public class AirbnbAnalysis{
         }
 
 
-        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
+//        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
+//
+//        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
-        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+        SparkSession spark = SparkSession
+                .builder()
+                .appName("Java Spark SQL data sources example")
+                .config("spark.some.config.option", "some-value")
+                .getOrCreate();
 
-        JavaRDD<String> inputFile = sparkContext.textFile(fileName);
-
-        JavaRDD<String> wordsFromFile = inputFile.flatMap(content -> Arrays.asList(content.split(" ")).iterator());
-
-        JavaPairRDD countData = wordsFromFile.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) -> (int) x + (int) y);
+        Dataset<Row> csv = spark.read().format("csv").option("header","true").option("delimiter", ";").load(fileName);
+        csv.show();
+//        JavaRDD<String> inputFile = sparkContext.textFile(fileName);
+//
+//        JavaRDD<String> wordsFromFile = inputFile.flatMap(content -> Arrays.asList(content.split(" ")).iterator());
+//
+//        JavaPairRDD countData = wordsFromFile.mapToPair(t -> new Tuple2(t, 1)).reduceByKey((x, y) -> (int) x + (int) y);
 
     }
 
