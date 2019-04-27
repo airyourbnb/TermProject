@@ -16,9 +16,19 @@ object Playground {
 
     val df = spark.read.format("org.apache.spark.csv").option("header", true).option("inferSchema", true).option("delimiter", ";").csv("hdfs:///airbnb/airbnb-listings.csv");
 
-    val fileRDD = spark.sparkContext.parallelize(df.columns, 1);
+    val amen = df.select("Amenities")
 
-    fileRDD.saveAsTextFile("/debug3/whaatttt");
+    val amenSample = amen.sample(.001)
+
+    val stuff = amenSample.rdd.collect
+
+    val fileRdd = spark.sparkContext.parallelize(stuff, 1)
+
+    fileRdd.saveAsTextFile("/debug3/metoothanks2me2thanks2")
+    //val fileRDD = spark.sparkContext.parallelize(amens.sample(.01), 1);
+    //fileRDD.saveAsTextFile("/debug3/whaat2");
+
+
 
     spark.stop();
   }
