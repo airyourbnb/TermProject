@@ -10,7 +10,11 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import java.util.ArrayList;
 import org.apache.spark.sql.SparkSession;
-
+import java.util.HashMap;
+import org.apache.spark.api.java.function.ForeachFunction;
+import java.util.function.Function;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.api.java.function.FlatMapFunction;
 /*
 https://spark.apache.org/docs/1.0.1/sql-programming-guide.html
 
@@ -38,21 +42,36 @@ public class TestPlay {
             result += " | " + s;
         }
 
-        writeAFile(result, "hdfs:///debug/column_name1572", sparkContext);
+        //writeAFile(result, "hdfs:///debug/column_name1576", sparkContext);
 
         //grab only columns we are interested in
-        Dataset<Row> trimmed = df.select("ID", "City", "State", "Zipcode", "Country", "Country Code", "Amenities", "Price", "Property Type", "Room Type", "Accommodates");
+
+        //"ID", "City", "State", "Zipcode", "Country", "Country Code",
+        Dataset<Row> trimmed = df.select( "Amenities");//, "Price", "Property Type", "Room Type", "Accommodates");
 
         String Tresult = "";
 
         String[] Tcols = trimmed.columns();
 
+        /*
+
         for (String s : Tcols) {
             Tresult += " | " + s;
         }
 
-        writeAFile(Tresult, "hdfs:///debug/trimmed_column_name1572", sparkContext);
+
+        FlatMapFunction<Row, Row> splitAms = row -> {
+            String[] ams = row.toString().split(",");
+            return RowFactory.create(ams);
+        };
+
+        Dataset<Row> amsBroken = trimmed.flatMap(splitAms);
+
+        writeAFile(amsBroken.head().toString, "hdfs:///debug/helpMe", sparkContext);
+        */
     }
+
+
 
     public static void writeAFile(String message, String filePath, JavaSparkContext SpContext) {
         ArrayList<String> temp = new ArrayList<String>();
