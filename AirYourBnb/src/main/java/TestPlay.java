@@ -38,11 +38,20 @@ public class TestPlay {
             result += " | " + s;
         }
 
-        writeAFile(result, "hdfs:///debug/column_name1570", sparkContext);
+        writeAFile(result, "hdfs:///debug/column_name1572", sparkContext);
 
+        //grab only columns we are interested in
+        Dataset<Row> trimmed = df.select("ID", "City", "State", "Zipcode", "Country", "Country Code", "Amenities", "Price", "Property Type", "Room Type", "Accommodates");
 
+        String Tresult = "";
 
+        String[] Tcols = trimmed.columns();
 
+        for (String s : Tcols) {
+            Tresult += " | " + s;
+        }
+
+        writeAFile(Tresult, "hdfs:///debug/trimmed_column_name1572", sparkContext);
     }
 
     public static void writeAFile(String message, String filePath, JavaSparkContext SpContext) {
