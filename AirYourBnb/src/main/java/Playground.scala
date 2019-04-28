@@ -22,6 +22,7 @@ object Playground {
     val df = spark.read.format("org.apache.spark.csv").option("header", true).option("delimiter", ";").csv("hdfs:///airbnb/out.csv")
 
     val amen = df.select("Amenities", "Price", "Country")
+    val table = df.select("ID", "Country", "Property Type", "Amenities", "Price", "Accommodates")
 
     val amenSample = amen.sample(.001)
 

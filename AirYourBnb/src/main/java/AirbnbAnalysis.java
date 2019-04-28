@@ -22,6 +22,16 @@ public class AirbnbAnalysis{
     //When we submit the job pass our hdfs cluster as a single arg 1 2 or 3
     public static void main(String[] args){
 
+        SparkSession spark = SparkSession
+                .builder()
+                .appName("Java Spark SQL data sources example")
+                .config("spark.some.config.option", "some-value")
+                .getOrCreate();
+
+//        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
+//        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
+
+
         String fileName = null;
         String anthony_hdfs = "hdfs://dover.cs.colostate.edu:42080/cs455/termproject/airbnb-listings.csv";
         String daniel_hdfs = "hdfs://juneau.cs.colostate.edu:11223/cs455/TERM/airbnb-listings.csv";
@@ -44,19 +54,9 @@ public class AirbnbAnalysis{
                 break;
         }
 
-
-//        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
-//
-//        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-
-        SparkSession spark = SparkSession
-                .builder()
-                .appName("Java Spark SQL data sources example")
-                .config("spark.some.config.option", "some-value")
-                .getOrCreate();
-
         Dataset<Row> csv = spark.read().format("csv").option("header","true").option("delimiter", ";").load(fileName);
-        csv.show();
+        //csv.show();
+        csv.write().json("/cs455/termproject/temp-data.json");
 //        JavaRDD<String> inputFile = sparkContext.textFile(fileName);
 //
 //        JavaRDD<String> wordsFromFile = inputFile.flatMap(content -> Arrays.asList(content.split(" ")).iterator());
