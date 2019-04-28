@@ -1,1 +1,0 @@
-val spark = SparkSession.builder().master("local[*]").config("spark.executor.memory", "70g").config("spark.driver.memory", "50g").config("spark.memory.offHeap.enabled",true).config("spark.memory.offHeap.size","16g")   .appName("sampleCodeForReference").getOrCreate()
