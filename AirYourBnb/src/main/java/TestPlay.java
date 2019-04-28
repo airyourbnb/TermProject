@@ -9,79 +9,89 @@ import java.util.Arrays;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import java.util.ArrayList;
+import org.apache.spark.sql.SparkSession;
+import java.util.HashMap;
+import org.apache.spark.api.java.function.ForeachFunction;
+import java.util.function.Function;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.api.java.function.FlatMapFunction;
+/*
+https://spark.apache.org/docs/1.0.1/sql-programming-guide.html
+
+
+
+FORMAT THAT WORKS
+
+https://stackoverflow.com/questions/36007686/how-to-parse-a-csv-that-uses-a-i-e-001-as-the-delimiter-with-spark-csv
+
+
+ */
+
 
 public class TestPlay {
 
-    private static void wordCount(String fileName) {
+    private static void wordCount(String fileName, JavaSparkContext sparkContext) {
 
-        SparkConf sparkConf = new SparkConf();//.setMaster("").setAppName("JD Word Counter");
-
-        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-
-
-
-        SQLContext sqlContext = new SQLContext(sparkContext);
-        Dataset<Row> df = sqlContext.read()
-                .format("com.databricks.spark.csv")
-                .option("inferSchema", "true")
-                .option("header", "true")
-                .load("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
-
+        SparkSession sparkSession = SparkSession.builder().getOrCreate();
+        Dataset<Row> df = sparkSession.read().format("org.apache.spark.csv").option("header",true).option("inferSchema", true).option("delimiter",";").csv("hdfs:///airbnb/airbnb-listings.csv");
 
         String[] cols = df.columns();
 
-
-
         String result = "";
-        for(String s:cols){
-            result += " " + s;
+        for (String s : cols) {
+            result += " | " + s;
+        }
+
+        //writeAFile(result, "hdfs:///debug/column_name1576", sparkContext);
+
+        //grab only columns we are interested in
+
+        //"ID", "City", "State", "Zipcode", "Country", "Country Code",
+        Dataset<Row> trimmed = df.select( "Amenities");//, "Price", "Property Type", "Room Type", "Accommodates");
+
+        String Tresult = "";
+
+        String[] Tcols = trimmed.columns();
+
+        /*
+
+        for (String s : Tcols) {
+            Tresult += " | " + s;
         }
 
 
+        FlatMapFunction<Row, Row> splitAms = row -> {
+            String[] ams = row.toString().split(",");
+            return RowFactory.create(ams);
+        };
 
-        /*
-        df.select("year", "model").write()
-                .format("com.databricks.spark.csv")
-                .option("header", "true")
-                .save("newcars.csv");
+        Dataset<Row> amsBroken = trimmed.flatMap(splitAms);
 
-
-
-        JavaRDD<String> inputFile = sparkContext.read().format("hdfs://jackson:2084/airbnb/airbnb-listings-schema.json").option("header","true").load("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
-
-        JavaRDD<String> wordsFromFile = inputFile.take(30);
+        writeAFile(amsBroken.head().toString, "hdfs:///debug/helpMe", sparkContext);
         */
     }
 
-    public static void writeAFile(String message, String filePath, JavaSparkContext SpContext){
+
+
+    public static void writeAFile(String message, String filePath, JavaSparkContext SpContext) {
         ArrayList<String> temp = new ArrayList<String>();
 
         temp.add(message);
 
-        JavaRDD<String> test = SpContext.parallelize(temp);
+        JavaRDD<String> test = SpContext.parallelize(temp, 1);
 
         test.saveAsTextFile(filePath);
     }
 
 
-
     public static void main(String[] args) {
-
-        //if (args.length == 0) {
-        //    System.out.println("No files provided.");
-        //    System.exit(0);
-        //}
 
         SparkConf sparkConf = new SparkConf();
 
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
 
-        writeAFile("baby got baka", "/debug_logs/babyGotBack", sparkContext);
-
         System.out.println("I AM INSIDE THE PROGRAM");
 
-        //TODO make sure to modify this when we run our code
-        //wordCount("hdfs://dover:42080/cs455/termproject/airbnb-listing.csv");
-        //wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv");
+        wordCount("hdfs://jackson:2084/airbnb/airbnb-listings.csv", sparkContext);
     }
 }

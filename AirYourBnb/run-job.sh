@@ -13,3 +13,4 @@ fi
 echo $#
 echo $SPARK_HOME/bin/spark-submit --master spark://$1:$2 --deploy-mode cluster --class $3 --supervise target/scala-2.11/$4_2.11-1.0.jar $5
 $SPARK_HOME/bin/spark-submit --master spark://$1:$2 --deploy-mode cluster --class $3 --supervise target/scala-2.11/$4_2.11-1.0.jar $5
+$HADOOP_HOME/bin/hadoop dfs -rmr /debug/
