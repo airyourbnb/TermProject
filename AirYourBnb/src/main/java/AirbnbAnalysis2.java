@@ -15,7 +15,7 @@ import scala.Tuple2;
 
 import java.util.Arrays;
 
-public class AirbnbAnalysis{
+public class AirbnbAnalysis2{
 
 
 
