@@ -11,6 +11,7 @@ https://stackoverflow.com/questions/40800920/how-do-i-convert-arrayrow-to-datafr
 
 object AirbnbAnalysis {
   def main(args: Array[String]) {
+    /*
 
     val spark = SparkSession
       .builder
@@ -57,5 +58,6 @@ object AirbnbAnalysis {
 
 
     spark.stop();
+    */
   }
 }
