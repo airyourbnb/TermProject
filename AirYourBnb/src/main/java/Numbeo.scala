@@ -27,15 +27,15 @@ object Numbeo {
 
     val dfSplitNoNullCountry = dfSplitCountry.where(dfSplitCountry.col("rent_index").isNotNull)
     val dfSplitNoNullCity = dfSplitCity.where(dfSplitCity.col("rent_index").isNotNull)
-
-    val sortedCountry = dfSplitNoNullCountry.sort($"rent_index".desc)
-    val sortedCity = dfSplitNoNullCity.sort($"rent_index".desc)
-
-    val fileRddCountry = sortedCountry.rdd
-    val fileRddCity = sortedCity.rdd
-
-    fileRddCountry.saveAsTextFile("/debug/testCountry")
-    fileRddCity.saveAsTextFile("/debug/testCity")
+//
+//    val sortedCountry = dfSplitNoNullCountry.sort($"rent_index".desc)
+//    val sortedCity = dfSplitNoNullCity.sort($"rent_index".desc)
+//
+//    val fileRddCountry = sortedCountry.rdd
+//    val fileRddCity = sortedCity.rdd
+//
+//    fileRddCountry.saveAsTextFile("/debug/testCountry")
+//    fileRddCity.saveAsTextFile("/debug/testCity")
 
     spark.stop()
   }
