@@ -35,10 +35,12 @@ object AirbnbAnalysis {
     val df = spark.read.format("org.apache.spark.csv").option("header", true).option("delimiter", ";").csv(filename)
     val table = df.select("ID", "Country", "Property Type", "Amenities", "Price", "Accommodates")
 
-    val country_listings = table.groupBy("Country").count().orderBy("Country")
+    val nn = table.where(df.col("ID").isNotNull).where(df.col("Country").isNotNull).where(df.col("Property Type").isNotNull)
+      .where(df.col("Accommodates").isNotNull).where(df.col("Amenities").isNotNull)
 
-    val amenity_list = table.rdd.map(row => ((row.getString(1)+":"+row.getString(2)), row.getString(3)))
-    val amenity_expanded = amenity_list.map(row => ())
+    val amenity_list = nn.rdd.map(row => ((row.getString(1)+":"+row.getString(2)), row.getString(3)))
+    val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.map(nr => (key+":"+nr, 1))}
+    val result = amenity_flattend.reduceByKey(  (x:(Int), y:( Int)) => ( x+y ) )
 
 
 /*
