@@ -60,12 +60,29 @@ object Playground {
     //country, property type, average per night per person, number of listings, total combined price/people
     val hmmst = lmao.map(row => (row._1._1, row._1._2, row._1._3, (row._2._1/row._2._2), row._2._2, row._2._1) )
 
+    val numPerHT = noNull5.rdd.map(row => ( (row.getString(0),  row.getString(2)), ( 1) ) )
+
+    val numPerHTred = numPerHT.reduceByKey((x:(Int), y:(Int)) => (x+y))
+
+
+    // key, av price of amenity, number of listings in region that had it
+    val fml = lmao.map(row => (row._1, (row._2._1/row._2._2), row._2._2))
+
+    //val defdef = fml.map(row => ( (row._1._1, row._1._2), row._1._3, row._2, row._3))
+    val defdef = fml.map(row => ( (row._1._1, row._1._2), row._1._3, row._2, row._3)).filter(row => row._4 > 250)
+
+    val joined1 = defdef.toDF.join(numPerHTred.toDF, "_1")
+
+    val huh = joined1.map(row => (row.getStruct(0).toString, row.getString(1), row.getInt(2), row.getInt(3).toFloat/row.getInt(4).toFloat  ))
+
+    val oof = huh.where(huh.col("_4").gt(.4))
+
+
     val countryRankingsMap = noNull5.rdd.flatMap(row =>  row.getString(4).split(",").map(am => ( (row.getString(0)), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ) )
     val countryRankingRed = countryRankingsMap.reduceByKey((x:(Int, Int), y:(Int, Int)) => (x._1+y._1, x._2+y._2))
-    val countryRankingSplit = countryRankingRed.map(row => (row._1, (row._2._1/row._2._2) )
+    val countryRankingSplit = countryRankingRed.map(row => (row._1, (row._2._1/row._2._2) ) )
     val countryRanking = countryRankingSplit.toDF.orderBy(desc("_2"))
 
-    val countryAmenitiesMap
 
 
     val perEverything = hmmst.toDF
