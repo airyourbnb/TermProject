@@ -10,6 +10,7 @@ import org.apache.spark.sql.functions.explode
 object Numbeo {
   def main(args: Array[String]) {
 
+    /*
     val spark = SparkSession
       .builder
       .appName("DFS Read Write Test")
@@ -38,5 +39,6 @@ object Numbeo {
     fileRddCity.saveAsTextFile("/debug/testCity")
 
     spark.stop()
+    */
   }
 }
