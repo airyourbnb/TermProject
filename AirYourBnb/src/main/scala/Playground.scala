@@ -3,14 +3,6 @@ import java.io.File
 import scala.io.Source._
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkContext._
-
-
-/*
-
-https://stackoverflow.com/questions/40800920/how-do-i-convert-arrayrow-to-dataframe
- */
 
 object Playground {
   def main(args: Array[String]) {
@@ -54,13 +46,13 @@ object Playground {
     //mapreduce to get total listings per country and total price per country
     //val hmm = noNull4.rdd.map(row => ( (row.getString(0),  row.getString(2)), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ).reduceByKey((x:(Int, Int), y:(Int, Int)) => (x._1+y._1, x._2+y._2))
 
-    val eylmao = noNull5.rdd.flatMap(row =>  row.getString(4).split(",").map(am => ( (row.getString(0), am), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ) )
+    val eylmao = noNull5.rdd.flatMap(row =>  row.getString(4).split(",").map(am => ( (row.getString(0),  row.getString(2), am), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ) )
     val lmao = eylmao.reduceByKey((x:(Int, Int), y:(Int, Int)) => (x._1+y._1, x._2+y._2))
     //make 5 columns in dataset
     //country, property type, average per night per person, number of listings, total combined price/people
     val hmmst = lmao.map(row => (row._1._1, row._1._2, row._1._3, (row._2._1/row._2._2), row._2._2, row._2._1) )
 
-    val numPerHT = noNull5.rdd.map(row => ( row.getString(0), ( 1)  ) )
+    val numPerHT = noNull5.rdd.map(row => ( (row.getString(0),  row.getString(2)), ( 1) ) )
 
     val numPerHTred = numPerHT.reduceByKey((x:(Int), y:(Int)) => (x+y))
 
@@ -69,23 +61,40 @@ object Playground {
     val fml = lmao.map(row => (row._1, (row._2._1/row._2._2), row._2._2))
 
     //val defdef = fml.map(row => ( (row._1._1, row._1._2), row._1._3, row._2, row._3))
-    val defdef = fml.map(row => ( (row._1._1), row._1._2, row._2, row._3)).filter(row => row._4 > 10)
+    val defdef = fml.map(row => ( (row._1._1, row._1._2), row._1._3, row._2, row._3)).filter(row => row._4 > 63)
 
     val joined1 = defdef.toDF.join(numPerHTred.toDF, "_1")
 
-    val huh = joined1.map(row => (row.getString(0), row.getString(1), row.getInt(2), row.getInt(3).toFloat/row.getInt(4).toFloat  ))
+    val huh = joined1.map(row => (row.getStruct(0).toString, row.getString(1), row.getInt(2), row.getInt(3).toFloat/row.getInt(4).toFloat  ))
 
     val oof = huh.where(huh.col("_4").gt(.4))
 
-    import org.apache.spark.sql.functions._
-
-    val jj = oof.groupBy(col("_1")).agg(sort_array(collect_list(col("_2"))) as "value")
+    val jj = oof.groupBy(col("_1")).agg(collect_list(col("_2")) as "value")
 
     val CountryHT_AvAmenities = jj.orderBy(desc("_1"))
 
     val newland = CountryHT_AvAmenities.map(row => (row.getString(0), row.getList(1).toString))
 
-    newland.coalesce(1).write.csv("/results/CountryOnly_AvAmenities2.csv")
+    newland.coalesce(1).write.csv("/results/CountryHT_AvAmenities2.csv")
+
+
+
+    val countryRankingsMap = noNull5.rdd.flatMap(row =>  row.getString(4).split(",").map(am => ( (row.getString(0)), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ) )
+    val countryRankingRed = countryRankingsMap.reduceByKey((x:(Int, Int), y:(Int, Int)) => (x._1+y._1, x._2+y._2))
+    val countryRankingSplit = countryRankingRed.map(row => (row._1, (row._2._1/row._2._2) ) )
+    val countryRanking = countryRankingSplit.toDF.orderBy(desc("_2"))
+
+
+
+    val perEverything = hmmst.toDF
+
+    val sorted = perEverything.orderBy(desc("_5"))
+
+
+    //val sorted = perEverything.orderBy(asc("_1"), asc("_3"), desc("_2"),  desc("_5"))
+
+    //val fileRDD = spark.sparkContext.parallelize(amens.sample(.01), 1);
+    //fileRDD.saveAsTextFile("/debug3/whaat2");
 
     val fileRdd = spark.sparkContext.parallelize(sorted.collect(), 1)
 
@@ -94,4 +103,3 @@ object Playground {
     spark.stop();
   }
 }
-
