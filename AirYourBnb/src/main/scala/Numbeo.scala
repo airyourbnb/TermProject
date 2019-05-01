@@ -3,19 +3,18 @@ import java.io.File
 import scala.io.Source._
 
 import org.apache.spark.sql.SparkSession
-
-import org.apache.spark.sql.functions._
-
+import org.apache.spark.sql.functions.explode
 
 object Numbeo {
   def main(args: Array[String]) {
 
     val spark = SparkSession.builder.appName("Numbeo Data Split").getOrCreate()
-    
+
     import spark.implicits._
 
     val sparkContext = spark.sparkContext
 
+    //TODO we all need to upload this into our clusters
     val df = spark.read.format("org.apache.spark.json").option("multiline", "true").json("hdfs:///cs455/TERM/numbeo-data-formated.json")
 
     val explodedCountry = df.select(explode(df("Index_Set_Country"))).toDF("Country")
@@ -23,7 +22,7 @@ object Numbeo {
 
     val dfSplitCountry = explodedCountry.select("Country.name","Country.rent_index")
     val dfSplitCity = explodedCity.select("City.name","City.rent_index")
-    
+
     val dfSplitCountryClI = explodedCountry.select("Country.name","Country.climate_index")
     val dfSplitCountryCPIRI = explodedCountry.select("Country.name","Country.cpi_and_rent_index")
     val dfSplitCountryCPII = explodedCountry.select("Country.name","Country.cpi_index")
@@ -44,7 +43,7 @@ object Numbeo {
 
     val dfSplitNoNullCountry = dfSplitCountry.where(dfSplitCountry.col("rent_index").isNotNull)
     val dfSplitNoNullCity = dfSplitCity.where(dfSplitCity.col("rent_index").isNotNull)
-    
+
     val dfSplitNoNullCountryClI = dfSplitCountryClI.where(dfSplitCountryClI.col("climate_index").isNotNull)
     val dfSplitNoNullCountryCPIRI = dfSplitCountryCPIRI.where(dfSplitCountryCPIRI.col("cpi_and_rent_index").isNotNull)
     val dfSplitNoNullCountryCPII = dfSplitCountryCPII.where(dfSplitCountryCPII.col("cpi_index").isNotNull)
@@ -62,10 +61,10 @@ object Numbeo {
     val dfSplitNoNullCountryTII = dfSplitCountryTII.where(dfSplitCountryTII.col("traffic_inefficiency_index").isNotNull)
     val dfSplitNoNullCountryTTI = dfSplitCountryTTI.where(dfSplitCountryTTI.col("traffic_time_index").isNotNull)
 
-    
+
     val sortedCountry = dfSplitNoNullCountry.sort($"rent_index".desc)
     val sortedCity = dfSplitNoNullCity.sort($"rent_index".desc)
-    
+
     val sortedCountryClI = dfSplitNoNullCountryClI.sort($"climate_index".desc)
     val sortedCountryCPIRI = dfSplitNoNullCountryCPIRI.sort($"cpi_and_rent_index".desc)
     val sortedCountryCPII = dfSplitNoNullCountryCPII.sort($"cpi_index".desc)
@@ -82,7 +81,7 @@ object Numbeo {
     val sortedCountryTI = dfSplitNoNullCountryTI.sort($"traffic_index".desc)
     val sortedCountryTII = dfSplitNoNullCountryTII.sort($"traffic_inefficiency_index".desc)
     val sortedCountryTTI = dfSplitNoNullCountryTTI.sort($"traffic_time_index".desc)
-    
+
     val sortedCountryFlipped = dfSplitNoNullCountry.sort($"rent_index".asc)
     val sortedCountryClIFlipped = dfSplitNoNullCountryClI.sort($"climate_index".asc)
     val sortedCountryCPIRIFlipped = dfSplitNoNullCountryCPIRI.sort($"cpi_and_rent_index".asc)
@@ -101,10 +100,10 @@ object Numbeo {
     val sortedCountryTIIFlipped = dfSplitNoNullCountryTII.sort($"traffic_inefficiency_index".asc)
     val sortedCountryTTIFlipped = dfSplitNoNullCountryTTI.sort($"traffic_time_index".asc)
 
-    
+
     val fileRddCountry = spark.sparkContext.parallelize(sortedCountry.rdd.collect(), 1)
     val fileRddCity = spark.sparkContext.parallelize(sortedCity.rdd.collect(), 1)
-    
+
     val fileRddCountryClI = spark.sparkContext.parallelize(sortedCountryClI.rdd.collect(), 1)
     val fileRddCountryCPIRI = spark.sparkContext.parallelize(sortedCountryCPIRI.rdd.collect(), 1)
     val fileRddCountryCPII = spark.sparkContext.parallelize(sortedCountryCPII.rdd.collect(), 1)
@@ -121,7 +120,7 @@ object Numbeo {
     val fileRddCountryTI = spark.sparkContext.parallelize(sortedCountryTI.rdd.collect(), 1)
     val fileRddCountryTII = spark.sparkContext.parallelize(sortedCountryTII.rdd.collect(), 1)
     val fileRddCountryTTI = spark.sparkContext.parallelize(sortedCountryTTI.rdd.collect(), 1)
-    
+
     val fileRddCountryFlipped = spark.sparkContext.parallelize(sortedCountryFlipped.rdd.collect(), 1)
     val fileRddCountryClIFlipped = spark.sparkContext.parallelize(sortedCountryClIFlipped.rdd.collect(), 1)
     val fileRddCountryCPIRIFlipped = spark.sparkContext.parallelize(sortedCountryCPIRIFlipped.rdd.collect(), 1)
@@ -142,7 +141,7 @@ object Numbeo {
 
     fileRddCountry.saveAsTextFile("/debug/testCountry")
     fileRddCity.saveAsTextFile("/debug/testCity")
-    
+
     fileRddCountryClI.saveAsTextFile("/results/climate_index")
     fileRddCountryCPIRI.saveAsTextFile("/results/cpi_and_rent_index")
     fileRddCountryCPII.saveAsTextFile("/results/cpi_index")
@@ -159,7 +158,7 @@ object Numbeo {
     fileRddCountryTI.saveAsTextFile("/results/traffic_index")
     fileRddCountryTII.saveAsTextFile("/results/traffic_inefficiency_index")
     fileRddCountryTTI.saveAsTextFile("/results/traffic_time_index")
-    
+
     fileRddCountryFlipped.saveAsTextFile("/results/flipped/rent_index")
     fileRddCountryClIFlipped.saveAsTextFile("/results/flipped/climate_index")
     fileRddCountryCPIRIFlipped.saveAsTextFile("/results/flipped/cpi_and_rent_index")
