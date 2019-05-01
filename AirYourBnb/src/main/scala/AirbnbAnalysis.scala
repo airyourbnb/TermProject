@@ -11,7 +11,9 @@ https://stackoverflow.com/questions/40800920/how-do-i-convert-arrayrow-to-datafr
 
 object AirbnbAnalysis {
   def main(args: Array[String]) {
-    /*
+
+    import sqlContext.implicits._
+    import org.apache.spark.sql.functions._
 
     val spark = SparkSession
       .builder
@@ -19,6 +21,7 @@ object AirbnbAnalysis {
       .getOrCreate()
 
     val sparkContext = spark.sparkContext;
+    val sqlContext = new org.apache.spark.sql.SQLContext(sparkContext)
 
     val anthony_hdfs = "hdfs:///cs455/termproject/airbnb-listings.csv"
     val daniel_hdfs = "hdfs:///cs455/TERM/airbnb-listings.csv"
@@ -35,23 +38,18 @@ object AirbnbAnalysis {
 
     val df = spark.read.format("org.apache.spark.csv").option("header", true).option("delimiter", ";").csv(filename)
 
-    val table = df.select("ID", "Country", "Property Type", "Amenities", "Price", "Accommodates")
-    
+    val table = df.select("Country","Price","Property Type", "Accommodates", "Amenities", "City")
 
-/*
-    val amenSample = amen.sample(.001)
+    //This scrapes the table and removes all of the invalid entries that contain null as a value
+    val notNull = table.where(df.col("Country").isNotNull).where(df.col("Price").isNotNull).where(df.col("Property Type").isNotNull).where(df.col("Accommodates").isNotNull).where(df.col("Amenities").isNotNull)
 
-    val stuff = amenSample.rdd.collect
+    //FIXME
+    val lmao = notNull.rdd.flatMap(row =>  row.getString(4).split(",").map(am => ( (row.getString(0),  row.getString(2), am), (row.getString(1).toInt/row.getString(3).toInt, 1) ) ) ).reduceByKey((x:(Int, Int), y:(Int, Int)) => (x._1+y._1, x._2+y._2))
+    val hmmst = lmao.map(row => (row._1._1, row._1._2, row._1._3, (row._2._1/row._2._2), row._2._2, row._2._1) )
 
-    val fileRdd = spark.sparkContext.parallelize(stuff, 1)
-*/
-    fileRdd.saveAsTextFile("/debug3/me4thanks6")
-    //val fileRDD = spark.sparkContext.parallelize(amens.sample(.01), 1);
-    //fileRDD.saveAsTextFile("/debug3/whaat2");
-
-
+    val total_listing_types = notNull.rdd.map(row => ( (row.getString(0),  row.getString(2)), ( 1) ) )
+        .reduceByKey((x:(Int), y:(Int)) => (x+y))
 
     spark.stop();
-    */
   }
 }
