@@ -38,14 +38,14 @@ object AirbnbAnalysis {
     val nn = table.where(df.col("ID").isNotNull).where(df.col("Country").isNotNull).where(df.col("Property Type").isNotNull).where(df.col("Accommodates").isNotNull).where(df.col("Amenities").isNotNull)
 
     val amenity_list = nn.rdd.map(row => (row.getString(1)+":"+row.getString(2), row.getString(3)))
-    //val amenity_list = nn.rdd.map(row => ((row.getString(1), row.getString(2)), row.getString(3)))
 
     val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.split(",").map(nr => (key+":"+nr, 1))}
-    //val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.split(",").map(nr => ((key,nr), 1))}
 
     val amenity_count = amenity_flattend.reduceByKey(  (x:(Int), y:( Int)) => ( x+y ) )
     val num_of_listings = amenity_list.map(key => (key, 1)).reduceByKey(_+_).toDF()
 
+    //This is an attempt to try to filter out amenities that are present in at least 50% of the listings
+    val avg_amenity = amenity_count.filter(x => num_of_listings.select("_2").where(num_of_listings.col("_2").contains(((x.split(":")(1)+":"+x.split(":")(2))))) / x._2 >.5)
 
 /*
     val amenSample = amen.sample(.001)
