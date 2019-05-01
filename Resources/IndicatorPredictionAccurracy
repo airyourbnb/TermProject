@@ -1,0 +1,18 @@
+92 	cpi_and_rent_index_out
+92 	rent_index_out
+102 	groceries_index_out
+108 	traffic_index_out
+108 	traffic_time_index_out
+110 	cpi_index_out
+116 	safety_index_out
+119 	quality_of_life_index_out
+124 	pp_inc_rent_out
+124 	traffic_inefficiency_index_out
+128 	property_price_to_income_ratio_out
+132 	pollution_index_out
+134 	restaurant_price_index_out
+142 	health_care_index_out
+144 	crime_index_out
+145 	climate_index_out
+152 	traffic_co2_index_out
+
