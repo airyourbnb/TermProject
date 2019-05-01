@@ -11,7 +11,6 @@ https://stackoverflow.com/questions/40800920/how-do-i-convert-arrayrow-to-datafr
 
 object AirbnbAnalysis {
   def main(args: Array[String]) {
-    /*
 
     val spark = SparkSession
       .builder
@@ -36,12 +35,16 @@ object AirbnbAnalysis {
     val df = spark.read.format("org.apache.spark.csv").option("header", true).option("delimiter", ";").csv(filename)
     val table = df.select("ID", "Country", "Property Type", "Amenities", "Price", "Accommodates")
 
-    val nn = table.where(df.col("ID").isNotNull).where(df.col("Country").isNotNull).where(df.col("Property Type").isNotNull)
-      .where(df.col("Accommodates").isNotNull).where(df.col("Amenities").isNotNull)
+    val nn = table.where(df.col("ID").isNotNull).where(df.col("Country").isNotNull).where(df.col("Property Type").isNotNull).where(df.col("Accommodates").isNotNull).where(df.col("Amenities").isNotNull)
 
-    val amenity_list = nn.rdd.map(row => ((row.getString(1)+":"+row.getString(2)), row.getString(3)))
-    val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.map(nr => (key+":"+nr, 1))}
-    val result = amenity_flattend.reduceByKey(  (x:(Int), y:( Int)) => ( x+y ) )
+    val amenity_list = nn.rdd.map(row => (row.getString(1)+":"+row.getString(2), row.getString(3)))
+    //val amenity_list = nn.rdd.map(row => ((row.getString(1), row.getString(2)), row.getString(3)))
+
+    val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.split(",").map(nr => (key+":"+nr, 1))}
+    //val amenity_flattend = amenity_list.flatMap{ case (key, list) => list.split(",").map(nr => ((key,nr), 1))}
+
+    val amenity_count = amenity_flattend.reduceByKey(  (x:(Int), y:( Int)) => ( x+y ) )
+    val num_of_listings = amenity_list.map(key => (key, 1)).reduceByKey(_+_).toDF()
 
 
 /*
@@ -58,6 +61,6 @@ object AirbnbAnalysis {
 
 
     spark.stop();
-    */
+
   }
 }
